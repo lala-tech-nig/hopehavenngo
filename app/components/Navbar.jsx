@@ -53,12 +53,14 @@ const Navbar = () => {
   const [confetti, setConfetti] = useState(false);
   const [toast, setToast] = useState('');
   const [form, setForm] = useState({ name: '', email: '', what: '' });
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = e => {
     e.preventDefault();
     setModalOpen(false);
+    setMenuOpen(false);
     setConfetti(true);
     setToast(`Thank you, ${form.name.trim() || "Friend"}, for willing to support humanity!`);
     setTimeout(() => setConfetti(false), 10000);
@@ -73,14 +75,26 @@ const Navbar = () => {
           <img src="/logo.png" alt="Logo" className="navbar-logo" />
           <span className="navbar-org">Hope Haven NGO</span>
         </div>
-        <div className="navbar-center">
-          <a href="#" className="navbar-link">Home</a>
-          <a href="#" className="navbar-link">About Us</a>
-          <a href="#" className="navbar-link">Contact Us</a>
+        <div className={`navbar-center ${menuOpen ? 'show' : ''}`}>
+          <a href="#" className="navbar-link" onClick={() => setMenuOpen(false)}>Home</a>
+          <a href="#" className="navbar-link" onClick={() => setMenuOpen(false)}>About Us</a>
+          <a href="#" className="navbar-link" onClick={() => setMenuOpen(false)}>Contact Us</a>
+          <button className="join-btn mobile-join" onClick={() => { setModalOpen(true); setMenuOpen(false); }}>
+            Join Us
+          </button>
         </div>
         <div className="navbar-right">
-          <button className="join-btn" onClick={() => setModalOpen(true)}>
+          <button className="join-btn desktop-join" onClick={() => setModalOpen(true)}>
             Join Us
+          </button>
+          <button
+            className={`hamburger ${menuOpen ? 'open' : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span />
+            <span />
+            <span />
           </button>
         </div>
       </nav>
@@ -199,6 +213,39 @@ const Navbar = () => {
         .join-btn:hover {
           background: #0056b3;
         }
+        .desktop-join {
+          display: inline-block;
+        }
+        .mobile-join {
+          display: none;
+        }
+        .hamburger {
+          display: none;
+          flex-direction: column;
+          gap: 5px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          margin-left: 1rem;
+          z-index: 101;
+        }
+        .hamburger span {
+          display: block;
+          width: 28px;
+          height: 3px;
+          background: #fff;
+          border-radius: 2px;
+          transition: 0.3s;
+        }
+        .hamburger.open span:nth-child(1) {
+          transform: translateY(8px) rotate(45deg);
+        }
+        .hamburger.open span:nth-child(2) {
+          opacity: 0;
+        }
+        .hamburger.open span:nth-child(3) {
+          transform: translateY(-8px) rotate(-45deg);
+        }
         /* Modal styles */
         .modal-backdrop {
           position: fixed;
@@ -288,34 +335,60 @@ const Navbar = () => {
         }
         @media (max-width: 768px) {
           .navbar {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0.7rem;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0;
             padding: 0.7rem 0.7rem;
+            width: 100vw;
           }
           .navbar-left {
-            justify-content: center;
-            margin-bottom: 0.5rem;
+            flex: 1;
+            justify-content: flex-start;
+            margin-bottom: 0;
           }
           .navbar-center {
+            display: none;
+            position: fixed;
+            top: 64px;
+            left: 0;
+            width: 100vw;
+            background: rgba(30,30,40,0.97);
             flex-direction: column;
-            gap: 0.7rem;
-            margin-bottom: 0.5rem;
+            gap: 1.2rem;
+            padding: 2rem 0 1.5rem 0;
+            z-index: 200;
+            align-items: center;
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+          }
+          .navbar-center.show {
+            display: flex;
           }
           .navbar-link {
-            width: 100%;
+            width: 90vw;
             text-align: center;
             font-size: 1.1rem;
             padding: 0.7rem 0;
+            background: rgba(255,255,255,0.10);
           }
           .navbar-right {
-            justify-content: center;
-            margin-bottom: 0.5rem;
+            flex: 1;
+            justify-content: flex-end;
+            margin-bottom: 0;
           }
-          .join-btn {
-            width: 100%;
-            padding: 0.8rem 0;
+          .join-btn.desktop-join {
+            display: none;
+          }
+          .join-btn.mobile-join {
+            display: block;
+            width: 90vw;
+            margin: 0 auto;
             font-size: 1.1rem;
+            padding: 0.8rem 0;
+          }
+          .hamburger {
+            display: flex;
           }
         }
         @media (max-width: 480px) {
@@ -332,6 +405,11 @@ const Navbar = () => {
           .modal {
             padding: 1rem 0.5rem 1rem 0.5rem;
             min-width: 90vw;
+          }
+          .navbar-center .navbar-link,
+          .navbar-center .join-btn.mobile-join {
+            font-size: 1rem;
+            padding: 0.7rem 0.2rem;
           }
         }
       `}</style>
