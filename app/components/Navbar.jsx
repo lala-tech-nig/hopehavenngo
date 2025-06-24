@@ -10,25 +10,26 @@ const Toast = ({ message, onClose }) => (
     <style>{`
       .toast {
         position: fixed;
-        bottom: 2.5rem;
-        left: 50%;
-        transform: translateX(-50%);
+        bottom: 0;
+        left: 0;
+        width: 100vw;
         background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
         color: #fff;
         padding: 1.1rem 2.2rem;
-        border-radius: 1.5rem;
+        border-radius: 0;
         font-size: 1.15rem;
         font-weight: 700;
-        box-shadow: 0 6px 32px rgba(0,0,0,0.18);
+        box-shadow: 0 -2px 32px rgba(0,0,0,0.18);
         z-index: 3000;
         display: flex;
         align-items: center;
         gap: 1.2rem;
+        justify-content: center;
         animation: toastIn 0.4s cubic-bezier(.68,-0.55,.27,1.55);
       }
       @keyframes toastIn {
-        from { opacity: 0; transform: translateX(-50%) translateY(40px);}
-        to { opacity: 1; transform: translateX(-50%) translateY(0);}
+        from { opacity: 0; transform: translateY(40px);}
+        to { opacity: 1; transform: translateY(0);}
       }
       .toast-close {
         background: none;
@@ -43,6 +44,15 @@ const Toast = ({ message, onClose }) => (
       }
       .toast-close:hover {
         opacity: 1;
+      }
+      @media (max-width: 768px) {
+        .toast {
+          font-size: 1rem;
+          padding: 0.8rem 1.5rem;
+        }
+        .toast-close {
+          font-size: 1.2rem;
+        }
       }
     `}</style>
   </div>
