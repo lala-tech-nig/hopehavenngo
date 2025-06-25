@@ -7,6 +7,7 @@ import Counter from "./components/Counter";
 import Contact from "./components/Contact";
 import Event from "./components/Event";
 import Slider from "./components/Slider";
+import Footer from "./components/Footer";
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <Counter />
       <Event />
       <Contact />
+      <Footer />
 
     </main>
   );
