@@ -91,7 +91,7 @@ const Navbar = () => {
       <nav className={`navbar ${menuOpen ? 'navbar-blur' : ''}`}>
         <div className="navbar-left">
           <img
-            src="/logo.png"
+            src="/hhflogo.png"
             alt="Logo"
             className="navbar-logo"
             style={{
