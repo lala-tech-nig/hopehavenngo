@@ -3,91 +3,127 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 const countersData = [
-	{ label: 'TODAY', target: 128, color: '#007bff' },
-	{ label: 'THIS MONTH', target: 3120, color: '#00c6ff' },
-	{ label: 'THIS YEAR', target: 18400, color: '#28a745' },
-	{ label: 'OVERALL', target: 102340, color: '#ff9800' }
+    { label: 'TODAY', target: 128, color: '#007bff' },
+    { label: 'THIS MONTH', target: 3120, color: '#00c6ff' },
+    { label: 'THIS YEAR', target: 18400, color: '#28a745' },
+    { label: 'OVERALL', target: 102340, color: '#ff9800' }
 ];
 
-function useCountUp(target, duration = 2000, delay = 0) {
-	const [count, setCount] = useState(0);
-	const raf = useRef();
+// Custom hook for animated counting with speed control
+function useCountUp(target, duration = 2000, delay = 0, slowEnd = false, initial = 0, stepInterval = null) {
+    const [count, setCount] = useState(initial);
+    const raf = useRef();
 
-	useEffect(() => {
-		let start = null;
-		let timeout;
-		function animate(ts) {
-			if (!start) start = ts;
-			const progress = Math.min((ts - start) / duration, 1);
-			setCount(Math.floor(progress * target));
-			if (progress < 1) {
-				raf.current = requestAnimationFrame(animate);
-			} else {
-				setCount(target);
-			}
-		}
-		timeout = setTimeout(() => {
-			raf.current = requestAnimationFrame(animate);
-		}, delay);
-		return () => {
-			clearTimeout(timeout);
-			cancelAnimationFrame(raf.current);
-		};
-	}, [target, duration, delay]);
+    useEffect(() => {
+        if (stepInterval) {
+            // For TODAY: increase by 1 every stepInterval ms until target
+            setCount(initial);
+         let interval = setInterval(() => {
+             setCount(prev => {
+                 if (prev < target) return prev + 1;
+                 clearInterval(interval);
+                 return target;
+             });
+         }, stepInterval);
+         return () => clearInterval(interval);
+        } else {
+            let start = null;
+            let timeout;
+            function animate(ts) {
+                if (!start) start = ts;
+                const elapsed = ts - start;
+                let progress = Math.min(elapsed / duration, 1);
 
-	return count;
+                // Slow down at the end if slowEnd is true
+                if (slowEnd && progress > 0.85) {
+                    progress = 0.85 + (progress - 0.85) / 2;
+                }
+
+                let next = Math.floor(progress * target);
+                setCount(next);
+
+                if (progress < 1 && next < target) {
+                    raf.current = requestAnimationFrame(animate);
+                } else {
+                    setCount(target);
+                }
+            }
+            timeout = setTimeout(() => {
+                raf.current = requestAnimationFrame(animate);
+            }, delay);
+            return () => {
+                clearTimeout(timeout);
+                cancelAnimationFrame(raf.current);
+            };
+        }
+    // eslint-disable-next-line
+    }, [target, duration, delay, slowEnd, initial, stepInterval]);
+
+    return count;
 }
 
 const Counter = () => {
-	// Animate each counter one after the other
-	const delays = [0, 500, 1000, 1500];
-	const counts = countersData.map((item, idx) =>
-		useCountUp(item.target, 1000, delays[idx])
-	);
+    // TODAY: start from random digit <= 20, increase by 1 every 30 minutes (1800000 ms)
+    const todayStart = React.useMemo(() => Math.floor(Math.random() * 20) + 1, []);
+    const todayCount = useCountUp(
+        countersData[0].target,
+        0,
+        0,
+        false,
+        todayStart,
+        1800000 // 30 minutes in ms
+    );
 
-	// Animate mounts from 1 to 500 in center
-	const [mounts, setMounts] = useState(1);
-	useEffect(() => {
-		let raf;
-		function animateMounts() {
-			setMounts(prev => {
-				if (prev < 500) {
-					raf = requestAnimationFrame(animateMounts);
-					return prev + 5;
-				}
-				return 500;
-			});
-		}
-		raf = requestAnimationFrame(animateMounts);
-		return () => cancelAnimationFrame(raf);
-	}, []);
+    // Other counters: fast, slow at end
+    const counts = [
+        todayCount,
+        useCountUp(countersData[1].target, 1200, 400, true),
+        useCountUp(countersData[2].target, 1800, 800, true),
+        useCountUp(countersData[3].target, 2200, 1200, true),
+    ];
 
-	return (
-		<div className="counter-bar">
-			<div className="counter-title">
-				<span>Live Touched</span>
-				<span className="counter-dot" />
-			</div>
-			<div className="counter-mounts">{mounts.toLocaleString()} Mounts</div>
-			<div className="counter-list">
-				{countersData.map((item, idx) => (
-					<div className="counter-item" key={item.label}>
-						<span className="counter-label">{item.label}</span>
-						<span className="counter-number" style={{ color: item.color }}>
-							{counts[idx].toLocaleString()}
-						</span>
-					</div>
-				))}
-			</div>
-			<style>{`
+    // Animate mounts from 1 to 500 in center
+    const [mounts, setMounts] = useState(1);
+    useEffect(() => {
+        let raf;
+        function animateMounts() {
+            setMounts(prev => {
+                if (prev < 500) {
+                    raf = requestAnimationFrame(animateMounts);
+                    return prev + 1;
+                }
+                return 500;
+            });
+        }
+        raf = requestAnimationFrame(animateMounts);
+        return () => cancelAnimationFrame(raf);
+    }, []);
+
+    return (
+        <div className="counter-bar">
+            <div className="counter-title">
+                <span>Lives Touched</span>
+            </div>
+            <div className="counter-mounts">{mounts.toLocaleString()} Mounts</div>
+            <div className="counter-list">
+                {countersData.map((item, idx) => (
+                    <div className="counter-item-box" key={item.label}>
+                        <span className="counter-label">{item.label}</span>
+                        <span className="counter-number" style={{ color: item.color }}>
+                            {counts[idx].toLocaleString()}
+                        </span>
+                    </div>
+                ))}
+            </div>
+            <style>{`
         .counter-bar {
           width: 80vw;
           max-width: 1100px;
           margin: 2.5rem auto 2.5rem auto;
-          background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
-          color: #fff;
+          background: linear-gradient(90deg, #e3f0ff 60%, #f8fafc 100%);
+          color: #222;
           padding: 2.2rem 0.5rem 1.5rem 0.5rem;
-          box-shadow: 0 2px 24px rgba(0,0,0,0.10);
+          box-shadow: 0 2px 24px rgba(0,0,0,0.08);
           border-radius: 2rem;
           display: flex;
           flex-direction: column;
@@ -101,58 +137,57 @@ const Counter = () => {
           font-weight: 900;
           letter-spacing: 2px;
           margin-bottom: 1.2rem;
-          position: relative;
+          color: #111;
+          text-shadow: none;
         }
         .counter-dot {
-          display: inline-block;
-          width: 14px;
-          height: 14px;
-          background: #28ff6a;
-          border-radius: 50%;
-          margin-left: 1rem;
-          box-shadow: 0 0 12px #28ff6a, 0 0 24px #28ff6a;
-          animation: pulseDot 1.2s infinite;
-        }
-        @keyframes pulseDot {
-          0% { box-shadow: 0 0 12px #28ff6a, 0 0 24px #28ff6a; }
-          50% { box-shadow: 0 0 24px #28ff6a, 0 0 48px #28ff6a; }
-          100% { box-shadow: 0 0 12px #28ff6a, 0 0 24px #28ff6a; }
+          display: none;
         }
         .counter-mounts {
-          font-size: 2.5rem;
-          font-weight: 900;
-          color: #fff;
+          font-size: 2.1rem;
+          font-weight: 800;
+          color: #222;
           margin-bottom: 1.7rem;
           text-align: center;
           letter-spacing: 2px;
-          text-shadow: 0 2px 12px rgba(0,0,0,0.13);
+          text-shadow: 0 2px 12px rgba(0,0,0,0.06);
         }
         .counter-list {
           display: flex;
           justify-content: center;
           align-items: flex-end;
-          gap: 3.5rem;
+          gap: 2.2rem;
           flex-wrap: wrap;
         }
-        .counter-item {
+        .counter-item-box {
+          background: rgba(0,123,255,0.06);
+          border-radius: 1.2rem;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+          padding: 1.2rem 2.2rem 1.1rem 2.2rem;
           display: flex;
           flex-direction: column;
           align-items: center;
           min-width: 120px;
           margin-bottom: 0.5rem;
+          border: 1.5px solid #e3f0ff;
+          transition: box-shadow 0.2s, border 0.2s;
+        }
+        .counter-item-box:hover {
+          box-shadow: 0 4px 24px #007bff11;
+          border: 1.5px solid #b3d8ff;
         }
         .counter-label {
           font-size: 1.1rem;
           font-weight: 700;
           margin-bottom: 0.4rem;
           letter-spacing: 1px;
-          color: #fff;
-          text-shadow: 0 2px 8px rgba(0,0,0,0.13);
+          color: #222;
+          text-shadow: none;
         }
         .counter-number {
           font-size: 2.2rem;
           font-weight: 900;
-          text-shadow: 0 2px 12px rgba(0,0,0,0.18);
+          text-shadow: 0 2px 12px rgba(0,0,0,0.08);
           transition: color 0.2s;
         }
         @media (max-width: 900px) {
@@ -160,16 +195,17 @@ const Counter = () => {
             font-size: 1.3rem;
           }
           .counter-list {
-            gap: 1.5rem;
+            gap: 1.2rem;
           }
-          .counter-item {
+          .counter-item-box {
             min-width: 90px;
+            padding: 0.8rem 1.2rem 0.8rem 1.2rem;
           }
           .counter-number {
             font-size: 1.3rem;
           }
           .counter-mounts {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
           }
         }
         @media (max-width: 600px) {
@@ -185,7 +221,7 @@ const Counter = () => {
           .counter-list {
             gap: 0.7rem;
           }
-          .counter-item {
+          .counter-item-box {
             min-width: 70px;
           }
           .counter-label {
@@ -197,10 +233,9 @@ const Counter = () => {
           .counter-mounts {
             font-size: 1.1rem;
           }
-        }
-      `}</style>
-		</div>
-	);
+        `}</style>
+        </div>
+    );
 };
 
 export default Counter;

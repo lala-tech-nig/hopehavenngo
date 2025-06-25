@@ -6,6 +6,7 @@ import Needhelp from "./components/Needhelp";
 import Counter from "./components/Counter";
 import Contact from "./components/Contact";
 import Event from "./components/Event";
+import Slider from "./components/Slider";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <Needhelp />
+      <Slider />
       <Counter />
       <Event />
       <Contact />
