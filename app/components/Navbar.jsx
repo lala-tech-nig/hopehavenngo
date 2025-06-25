@@ -3,6 +3,14 @@
 import React, { useState } from 'react';
 import Confetti from 'react-confetti';
 
+// Animated underline for nav links
+const AnimatedLink = ({ children, ...props }) => (
+  <a {...props} className={`navbar-link ${props.className || ''}`}>
+    <span className="navbar-link-text">{children}</span>
+    <span className="navbar-link-underline" />
+  </a>
+);
+
 const Toast = ({ message, onClose }) => (
   <div className="toast">
     {message}
@@ -80,22 +88,33 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="navbar">
+      <nav className={`navbar ${menuOpen ? 'navbar-blur' : ''}`}>
         <div className="navbar-left">
-          <img src="/logo.png" alt="Logo" className="navbar-logo" />
-          <span className="navbar-org">Hope Haven NGO</span>
+          <img
+            src="/logo.png"
+            alt="Logo"
+            className="navbar-logo"
+            style={{
+              animation: "logoPop 1s cubic-bezier(.68,-0.55,.27,1.55)"
+            }}
+          />
+          <span className="navbar-org">
+            <span className="navbar-org-highlight">Hope</span> Haven NGO
+          </span>
         </div>
         <div className={`navbar-center ${menuOpen ? 'show' : ''}`}>
-          <a href="#" className="navbar-link" onClick={() => setMenuOpen(false)}>Home</a>
-          <a href="#" className="navbar-link" onClick={() => setMenuOpen(false)}>About Us</a>
-          <a href="#" className="navbar-link" onClick={() => setMenuOpen(false)}>Contact Us</a>
+          <AnimatedLink href="#" onClick={() => setMenuOpen(false)}>Home</AnimatedLink>
+          <AnimatedLink href="#" onClick={() => setMenuOpen(false)}>About Us</AnimatedLink>
+          <AnimatedLink href="#" onClick={() => setMenuOpen(false)}>Contact Us</AnimatedLink>
           <button className="join-btn mobile-join" onClick={() => { setModalOpen(true); setMenuOpen(false); }}>
-            Join Us
+            <span className="join-btn-glow" />
+            <span>Join Us</span>
           </button>
         </div>
         <div className="navbar-right">
           <button className="join-btn desktop-join" onClick={() => setModalOpen(true)}>
-            Join Us
+            <span className="join-btn-glow" />
+            <span>Join Us</span>
           </button>
           <button
             className={`hamburger ${menuOpen ? 'open' : ''}`}
@@ -138,7 +157,10 @@ const Navbar = () => {
                 required
                 rows={3}
               />
-              <button type="submit">Submit</button>
+              <button type="submit" className="modal-submit-animated">
+                <span>Submit</span>
+                <span className="modal-submit-arrow">→</span>
+              </button>
             </form>
             <button className="modal-close" onClick={() => setModalOpen(false)}>×</button>
           </div>
@@ -163,6 +185,16 @@ const Navbar = () => {
           top: 0;
           left: 0;
           z-index: 100;
+          animation: navbarFadeIn 1.2s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        .navbar-blur {
+          background: rgba(30, 30, 40, 0.85) !important;
+          backdrop-filter: blur(32px) !important;
+          transition: background 0.3s, backdrop-filter 0.3s;
+        }
+        @keyframes navbarFadeIn {
+          from { opacity: 0; transform: translateY(-40px);}
+          to { opacity: 1; transform: translateY(0);}
         }
         .navbar-left {
           display: flex;
@@ -170,11 +202,17 @@ const Navbar = () => {
           gap: 0.8rem;
         }
         .navbar-logo {
-          height: 44px;
-          width: 44px;
+          height: 48px;
+          width: 48px;
           object-fit: contain;
-          border-radius: 12px;
+          border-radius: 14px;
           box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+          background: #fff;
+        }
+        @keyframes logoPop {
+          0% { transform: scale(0.7) rotate(-10deg); opacity: 0; }
+          60% { transform: scale(1.15) rotate(8deg); opacity: 1; }
+          100% { transform: scale(1) rotate(0deg);}
         }
         .navbar-org {
           font-size: 1.7rem;
@@ -182,6 +220,21 @@ const Navbar = () => {
           color: #fff;
           letter-spacing: 1.5px;
           text-shadow: 0 2px 12px rgba(0,0,0,0.22);
+          background: linear-gradient(90deg, #fff 60%, #00c6ff 100%);
+          background-clip: text;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+        }
+        .navbar-org-highlight {
+          color: #007bff;
+          background: none;
+          -webkit-text-fill-color: #007bff;
+          font-weight: 900;
+          letter-spacing: 2px;
+          margin-right: 0.2em;
         }
         .navbar-center {
           display: flex;
@@ -199,8 +252,31 @@ const Navbar = () => {
           transition: background 0.2s, color 0.2s, box-shadow 0.2s;
           text-decoration: none;
           box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+          position: relative;
+          overflow: hidden;
         }
-        .navbar-link:hover {
+        .navbar-link-text {
+          position: relative;
+          z-index: 2;
+        }
+        .navbar-link-underline {
+          position: absolute;
+          left: 20%;
+          right: 20%;
+          bottom: 8px;
+          height: 3px;
+          background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
+          border-radius: 2px;
+          transform: scaleX(0);
+          transition: transform 0.3s cubic-bezier(.68,-0.55,.27,1.55);
+          z-index: 1;
+        }
+        .navbar-link:hover .navbar-link-underline,
+        .navbar-link:focus .navbar-link-underline {
+          transform: scaleX(1);
+        }
+        .navbar-link:hover,
+        .navbar-link:focus {
           background: rgba(255,255,255,0.25);
           color: #222;
         }
@@ -209,6 +285,7 @@ const Navbar = () => {
           align-items: center;
         }
         .join-btn {
+          position: relative;
           padding: 0.8rem 2.3rem;
           font-size: 1.13rem;
           font-weight: 800;
@@ -218,10 +295,33 @@ const Navbar = () => {
           border-radius: 30px;
           cursor: pointer;
           box-shadow: 0 2px 12px rgba(0,0,0,0.10);
-          transition: background 0.2s, color 0.2s;
+          transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+          overflow: hidden;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .join-btn-glow {
+          position: absolute;
+          top: 50%; left: 50%;
+          width: 120%;
+          height: 120%;
+          background: radial-gradient(circle, #00c6ff55 0%, transparent 70%);
+          transform: translate(-50%, -50%) scale(0.95);
+          opacity: 0.7;
+          z-index: 0;
+          pointer-events: none;
+          animation: joinGlow 2.5s infinite alternate;
+        }
+        @keyframes joinGlow {
+          0% { opacity: 0.7; transform: translate(-50%, -50%) scale(0.95);}
+          100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1);}
         }
         .join-btn:hover {
           background: #0056b3;
+          color: #fff;
+          box-shadow: 0 4px 24px #00c6ff44;
         }
         .desktop-join {
           display: inline-block;
@@ -265,6 +365,11 @@ const Navbar = () => {
           display: flex;
           align-items: center;
           justify-content: center;
+          animation: modalBackdropIn 0.3s;
+        }
+        @keyframes modalBackdropIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
         .modal {
           background: #fff;
@@ -274,7 +379,7 @@ const Navbar = () => {
           min-width: 320px;
           max-width: 90vw;
           position: relative;
-          animation: modalIn 0.3s cubic-bezier(.68,-0.55,.27,1.55);
+          animation: modalIn 0.4s cubic-bezier(.68,-0.55,.27,1.55);
         }
         @keyframes modalIn {
           from { transform: scale(0.8) translateY(-40px); opacity: 0; }
@@ -300,12 +405,14 @@ const Navbar = () => {
           font-family: inherit;
           outline: none;
           resize: none;
+          transition: border 0.2s, box-shadow 0.2s;
         }
         .modal input:focus, .modal textarea:focus {
           border-color: #007bff;
+          box-shadow: 0 0 0 2px #007bff33;
         }
-        .modal button[type="submit"] {
-          background: #007bff;
+        .modal-submit-animated {
+          background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
           color: #fff;
           font-weight: 700;
           border: none;
@@ -315,9 +422,22 @@ const Navbar = () => {
           cursor: pointer;
           margin-top: 0.5rem;
           transition: background 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.7rem;
+          position: relative;
+          overflow: hidden;
         }
-        .modal button[type="submit"]:hover {
-          background: #0056b3;
+        .modal-submit-animated:hover {
+          background: linear-gradient(90deg, #0056b3 60%, #00aaff 100%);
+        }
+        .modal-submit-arrow {
+          font-size: 1.3em;
+          transition: transform 0.2s;
+        }
+        .modal-submit-animated:hover .modal-submit-arrow {
+          transform: translateX(8px) scale(1.2);
         }
         .modal-close {
           position: absolute;
@@ -371,6 +491,11 @@ const Navbar = () => {
             align-items: center;
             border-bottom-left-radius: 18px;
             border-bottom-right-radius: 18px;
+            animation: navbarMenuDrop 0.4s cubic-bezier(.68,-0.55,.27,1.55);
+          }
+          @keyframes navbarMenuDrop {
+            from { opacity: 0; transform: translateY(-40px);}
+            to { opacity: 1; transform: translateY(0);}
           }
           .navbar-center.show {
             display: flex;
@@ -391,7 +516,7 @@ const Navbar = () => {
             display: none;
           }
           .join-btn.mobile-join {
-            display: block;
+            display: flex;
             width: 90vw;
             margin: 0 auto;
             font-size: 1.1rem;

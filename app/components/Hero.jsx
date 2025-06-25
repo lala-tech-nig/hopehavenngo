@@ -3,7 +3,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const title = "WELCOME TO HOPE HAVEN NGO";
+const title = "HOPE HAVEN FOUNDATION";
+const subtitle = "Widows, Orphans and the Vulnerable ones.";
 
 const letterVariants = {
   hidden: { y: -100, opacity: 0 },
@@ -14,6 +15,20 @@ const letterVariants = {
       delay: 0.2 + i * 0.07,
       type: "spring",
       stiffness: 600,
+      damping: 18,
+    },
+  }),
+};
+
+const subtitleLetterVariants = {
+  hidden: { y: -40, opacity: 0 },
+  visible: (i) => ({
+    y: 0,
+    opacity: 1,
+    transition: {
+      delay: 1.2 + i * 0.03,
+      type: "spring",
+      stiffness: 400,
       damping: 18,
     },
   }),
@@ -97,7 +112,7 @@ const Hero = () => {
             )
           )}
         </motion.h1>
-        <div
+        <motion.div
           style={{
             fontSize: "1.45rem",
             fontWeight: 500,
@@ -106,10 +121,32 @@ const Hero = () => {
             textShadow: "0 2px 8px rgba(0,0,0,0.25)",
             letterSpacing: "0.5px",
             lineHeight: 1.4,
+            display: "inline-block",
+            minHeight: "2.5em",
           }}
+          aria-label={subtitle}
         >
-          Empowering communities, changing lives, and spreading hope together.
-        </div>
+          {subtitle.split("").map((char, i) =>
+            char === " " ? (
+              <span key={i} style={{ display: "inline-block", width: "0.35em" }}>
+                &nbsp;
+              </span>
+            ) : (
+              <motion.span
+                key={i}
+                custom={i}
+                initial="hidden"
+                animate="visible"
+                variants={subtitleLetterVariants}
+                style={{
+                  display: "inline-block",
+                }}
+              >
+                {char}
+              </motion.span>
+            )
+          )}
+        </motion.div>
         <div
           style={{
             display: "flex",
