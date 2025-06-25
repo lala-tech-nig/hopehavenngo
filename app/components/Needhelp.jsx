@@ -296,7 +296,7 @@ const Needhelp = () => {
         .needhelp-floating-container {
           position: fixed;
           right: 1.2rem;
-          bottom: 3.5rem;
+          bottom: 6.5rem; /* was 3.5rem, now higher */
           z-index: 3002;
           display: flex;
           align-items: center;
@@ -361,7 +361,7 @@ const Needhelp = () => {
           }
           .needhelp-floating-container {
             right: 0.7rem;
-            bottom: 1.2rem;
+            bottom: 4.5rem; /* was 1.2rem, now higher */
           }
           .needhelp-floating {
             width: 48px;

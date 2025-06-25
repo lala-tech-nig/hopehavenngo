@@ -10,12 +10,14 @@ import Slider from "./components/Slider";
 import Footer from "./components/Footer";
 import Testimonies from "./components/Testimonies";
 import Team from "./components/Team";
+import Whatsapp from "./components/Whatsapp";
 
 export default function Home() {
   return (
     <main>
       <Navbar />
       <Hero />
+      <Whatsapp />
       <Needhelp />
       <Slider />
       <Counter />
