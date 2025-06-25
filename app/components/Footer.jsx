@@ -31,7 +31,7 @@ const Footer = () => {
       <div className="footer-content">
         <div className="footer-main">
           <div className="footer-logo-block">
-            <img src="/hflogo.png" alt="Hope Haven NGO" className="footer-logo-img" />
+            <img src="/hhflogo.png" alt="Hope Haven NGO" className="footer-logo-img" />
             <span className="footer-org-name">Hope Haven NGO</span>
           </div>
           <form className="footer-newsletter" onSubmit={handleNewsletter}>
@@ -78,6 +78,17 @@ const Footer = () => {
                 {link.icon}
               </a>
             ))}
+          </div>
+          <div className="footer-contact">
+            <div>
+              <strong>Address:</strong> 123 Hope Street, Abuja, Nigeria
+            </div>
+            <div>
+              <strong>Phone:</strong> <a href="tel:+2348000000000">+234 800 000 0000</a>
+            </div>
+            <div>
+              <strong>Email:</strong> <a href="mailto:info@hopehavenngo.org">info@hopehavenngo.org</a>
+            </div>
           </div>
           <div className="footer-copy">
             &copy; {new Date().getFullYear()} Hope Haven NGO. All rights reserved.
@@ -261,6 +272,21 @@ const Footer = () => {
           color: #fff;
           transform: scale(1.13) rotate(-8deg);
           box-shadow: 0 4px 18px #007bff33;
+        }
+        .footer-contact {
+          color: #222;
+          font-size: 1rem;
+          margin: 0.7rem 0 0.2rem 0;
+          text-align: left;
+          line-height: 1.7;
+        }
+        .footer-contact a {
+          color: #007bff;
+          text-decoration: underline;
+          transition: color 0.2s;
+        }
+        .footer-contact a:hover {
+          color: #0056b3;
         }
         .footer-copy {
           color: #444;

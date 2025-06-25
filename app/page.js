@@ -8,6 +8,8 @@ import Contact from "./components/Contact";
 import Event from "./components/Event";
 import Slider from "./components/Slider";
 import Footer from "./components/Footer";
+import Testimonies from "./components/Testimonies";
+import Team from "./components/Team";
 
 export default function Home() {
   return (
@@ -18,6 +20,8 @@ export default function Home() {
       <Slider />
       <Counter />
       <Event />
+      <Testimonies />
+      <Team />
       <Contact />
       <Footer />
 
